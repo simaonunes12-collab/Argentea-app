@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { appContent, type TrainingItem } from '../config/content'
+import { appContent } from '../config/content'
 import { buildCourseInquiryMailto } from '../lib/courseMailto'
 import { getCourses } from '../services/auth'
 
@@ -36,20 +36,6 @@ function mapRowToCourseLike(row: CourseRow): CourseLike {
   }
 }
 
-function mapItemToCourseLike(item: TrainingItem): CourseLike {
-  return {
-    id: item.id,
-    title: item.title,
-    shortDescription: item.shortDescription,
-    longDescription: item.longDescription,
-    content: item.content ?? item.longDescription,
-    recipients: item.recipients,
-    duration: item.duration,
-    priceLabel: item.priceLabel ?? 'Sob consulta',
-    contactEmail: appContent.contact.email,
-    contactPhone: appContent.contact.phone,
-  }
-}
 
 function thumbBackground(id: string) {
   let hash = 0
@@ -62,13 +48,8 @@ function thumbBackground(id: string) {
 export function Home() {
   const { title, intro } = appContent.home
 
-  const fallbackCourses = useMemo(() => {
-    const fromCourses = appContent.courses as unknown as TrainingItem[]
-    if (fromCourses.length > 0) return fromCourses.map(mapItemToCourseLike)
-    return (appContent.home.highlights as unknown as TrainingItem[]).map(mapItemToCourseLike)
-  }, [])
-
-  const [courses, setCourses] = useState<CourseLike[]>(fallbackCourses)
+  const [courses, setCourses] = useState<CourseLike[]>([])
+  const [loading, setLoading] = useState(true)
   const [coursesError, setCoursesError] = useState<string | null>(null)
   const [selectedCourse, setSelectedCourse] = useState<CourseLike | null>(null)
 
@@ -84,15 +65,17 @@ export function Home() {
     let active = true
 
     async function loadCourses() {
+      setLoading(true)
       try {
         const rows = await getCourses()
-        if (!active || rows.length === 0) return
-
+        if (!active) return
         setCourses(rows.map(mapRowToCourseLike))
       } catch (err) {
         if (!active) return
         const message = err instanceof Error ? err.message : 'Não foi possível carregar os cursos.'
         setCoursesError(message)
+      } finally {
+        if (active) setLoading(false)
       }
     }
 
@@ -119,6 +102,10 @@ export function Home() {
         <p>{intro}</p>
         {coursesError && <p className="form-message form-message--error">{coursesError}</p>}
       </header>
+
+      {loading && (
+        <p className="page-loading" aria-live="polite">A carregar cursos…</p>
+      )}
 
       <ul className="thumb-grid" aria-label="Lista de cursos">
         {courses.map((course) => (

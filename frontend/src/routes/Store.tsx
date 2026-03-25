@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { appContent } from '../config/content'
 import { addToCart } from '../lib/cartStorage'
 import { getProducts } from '../services/auth'
@@ -23,13 +23,8 @@ function thumbBackground(id: string) {
 export function Store() {
   const { title, intro } = appContent.store
 
-  const fallbackProducts = useMemo(() => {
-    const fromProducts = appContent.products as unknown as ProductLike[]
-    if (fromProducts.length > 0) return fromProducts
-    return appContent.store.trainings as unknown as ProductLike[]
-  }, [])
-
-  const [products, setProducts] = useState<ProductLike[]>(fallbackProducts)
+  const [products, setProducts] = useState<ProductLike[]>([])
+  const [loading, setLoading] = useState(true)
   const [productsError, setProductsError] = useState<string | null>(null)
   const [selectedProduct, setSelectedProduct] = useState<ProductLike | null>(null)
 
@@ -37,10 +32,10 @@ export function Store() {
     let active = true
 
     async function loadProducts() {
+      setLoading(true)
       try {
         const rows = await getProducts()
-        if (!active || rows.length === 0) return
-
+        if (!active) return
         setProducts(
           rows.map((row) => ({
             id: row.id,
@@ -55,6 +50,8 @@ export function Store() {
         if (!active) return
         const message = err instanceof Error ? err.message : 'Não foi possível carregar os produtos.'
         setProductsError(message)
+      } finally {
+        if (active) setLoading(false)
       }
     }
 
@@ -85,6 +82,10 @@ export function Store() {
         <p>{intro}</p>
         {productsError && <p className="form-message form-message--error">{productsError}</p>}
       </header>
+
+      {loading && (
+        <p className="page-loading" aria-live="polite">A carregar produtos…</p>
+      )}
 
       <section className="store-list" aria-label="Lista de produtos disponíveis">
         <ul className="thumb-grid" aria-label="Lista de produtos">
