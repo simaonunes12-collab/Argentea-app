@@ -1,5 +1,6 @@
 import { type FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { PasswordField } from '../components/PasswordField'
 import { signIn } from '../services/auth'
 
 export function Landing() {
@@ -32,7 +33,7 @@ export function Landing() {
     try {
       setIsSubmitting(true)
       await signIn(trimmedEmail, password)
-      navigate('/home', { replace: true })
+      navigate('/inicio', { replace: true })
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Não foi possível iniciar sessão. Tente novamente.'
@@ -84,11 +85,9 @@ export function Landing() {
             <label className="form-label" htmlFor="password">
               Palavra-passe
             </label>
-            <input
+            <PasswordField
               id="password"
               name="password"
-              type="password"
-              className="form-input"
               autoComplete="current-password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}

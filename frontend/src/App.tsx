@@ -1,17 +1,32 @@
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import './App.css'
 import { TabBar } from './components/TabBar'
 import { Landing } from './routes/Landing'
 import { Register } from './routes/Auth/Register'
 import { Login } from './routes/Auth/Login'
 import { ResetPassword } from './routes/Auth/ResetPassword'
+import { AppHome } from './routes/AppHome'
 import { Home } from './routes/Home'
 import { Profile } from './routes/Profile'
 import { Store } from './routes/Store'
 import { Cart } from './routes/Cart'
+import { markPasswordRecoveryPending, onAuthStateChange } from './services/auth'
 
 function App() {
   const location = useLocation()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const { data } = onAuthStateChange((event) => {
+      if (event !== 'PASSWORD_RECOVERY') return
+      markPasswordRecoveryPending()
+      if (window.location.pathname !== '/auth/reset-password') {
+        navigate('/auth/reset-password', { replace: true })
+      }
+    })
+    return () => data.subscription.unsubscribe()
+  }, [navigate])
 
   return (
     <div className="app-shell">
@@ -21,6 +36,7 @@ function App() {
           <Route path="/auth/register" element={<Register />} />
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/reset-password" element={<ResetPassword />} />
+          <Route path="/inicio" element={<AppHome />} />
           <Route path="/home" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/store" element={<Store />} />

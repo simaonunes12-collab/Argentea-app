@@ -46,7 +46,7 @@ function thumbBackground(id: string) {
 }
 
 export function Home() {
-  const { title, intro } = appContent.home
+  const { title, intro, enrollmentFormUrl, enrollmentFormLabel } = appContent.home
 
   const [courses, setCourses] = useState<CourseLike[]>([])
   const [loading, setLoading] = useState(true)
@@ -196,6 +196,14 @@ export function Home() {
             <div className="modal-actions modal-actions--course">
               <a className="button button--primary" href={inquiryMailto}>
                 Saber mais
+              </a>
+              <a
+                className="button button--secondary"
+                href={enrollmentFormUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {enrollmentFormLabel}
               </a>
               <button
                 type="button"

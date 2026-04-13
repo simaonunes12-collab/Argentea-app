@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { PasswordField } from '../components/PasswordField'
 import {
   getAvatarSignedUrl,
   getCurrentUser,
@@ -197,22 +198,24 @@ export function Profile() {
           </form>
 
           <form className="profile-password" onSubmit={handleUpdatePassword}>
-            <label className="field">
+            <label className="field" htmlFor="profile-new-password">
               <span className="field-label">Nova palavra-passe</span>
-              <input
-                className="field-input"
-                type="password"
+              <PasswordField
+                id="profile-new-password"
+                inputClassName="field-input"
+                autoComplete="new-password"
                 value={newPassword}
                 placeholder="••••••••"
                 onChange={(e) => setNewPassword(e.target.value)}
               />
             </label>
 
-            <label className="field">
+            <label className="field" htmlFor="profile-confirm-password">
               <span className="field-label">Confirmar palavra-passe</span>
-              <input
-                className="field-input"
-                type="password"
+              <PasswordField
+                id="profile-confirm-password"
+                inputClassName="field-input"
+                autoComplete="new-password"
                 value={confirmPassword}
                 placeholder="••••••••"
                 onChange={(e) => setConfirmPassword(e.target.value)}

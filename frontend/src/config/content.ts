@@ -83,6 +83,28 @@ export const appContent = {
     intro:
       '',
     highlights: coursesData,
+    enrollmentFormUrl:
+      'https://docs.google.com/forms/d/e/1FAIpQLScctpB5aHVUyghiREL1HhQe45Qo0hGWjNX8haW__WQkD87fuw/viewform',
+    enrollmentFormLabel: 'Inscrever-me',
+  },
+  appHome: {
+    title: 'Bem-vindo à Argentea',
+    intro:
+      'Somos o que ensinamos numa lógica de formação ao longo da vida',
+    sectionLinksTitle: '',
+    sectionTipsTitle: 'O que pode fazer aqui',
+    tips: [
+      'Consultar formações de segurança e solicitar mais informações por email.',
+      'Explorar produtos na loja e preparar pedidos.',
+      'Atualizar dados pessoais e palavra-passe no perfil.',
+    ] as const,
+    quickLinks: [
+      { path: '/home', label: 'Cursos', blurb: 'Verifique o nosso catálogo de formações e inscreva-se!' },
+      { path: '/store', label: 'Loja', blurb: 'Produtos disponíveis.' },
+    ] as const,
+    sectionContactTitle: 'Precisa de ajuda?',
+    sectionContactIntro:
+      'Para dúvidas sobre formações, loja ou a sua conta, contacte a equipa Argentea.',
   },
   profile: {
     title: 'Perfil',
@@ -97,9 +119,9 @@ export const appContent = {
     callToActionLabel: 'Quero inscrever-me / Saber mais',
   },
   contact: {
-    email: 'info@suaempresa.pt',
-    phone: '+351 000 000 000',
-    website: 'https://www.suaempresa.pt',
+    email: 'info@argentea.eu',
+    phone: '+351 927 574 060',
+    website: 'https://www.argentea.eu',
   },
 } as const
 

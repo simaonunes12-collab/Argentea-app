@@ -1,11 +1,13 @@
 import { type FormEvent, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { PasswordField } from '../../components/PasswordField'
 import { signUp } from '../../services/auth'
 
 export function Register() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -22,8 +24,13 @@ export function Register() {
     const trimmedName = name.trim()
     const trimmedEmail = email.trim()
 
-    if (!trimmedName || !trimmedEmail || !password) {
+    if (!trimmedName || !trimmedEmail || !password || !confirmPassword) {
       setError('Preencha todos os campos obrigatórios.')
+      return
+    }
+
+    if (password !== confirmPassword) {
+      setError('As palavras-passe não coincidem.')
       return
     }
 
@@ -47,6 +54,7 @@ export function Register() {
       setName('')
       setEmail('')
       setPassword('')
+      setConfirmPassword('')
     } catch (err) {
       const message =
         err instanceof Error
@@ -63,6 +71,9 @@ export function Register() {
       setIsSubmitting(false)
     }
   }
+
+  const passwordsMismatch =
+    confirmPassword.length > 0 && password !== confirmPassword
 
   return (
     <section className="page page--auth">
@@ -111,11 +122,9 @@ export function Register() {
           <label className="form-label" htmlFor="password">
             Palavra-passe
           </label>
-          <input
+          <PasswordField
             id="password"
             name="password"
-            type="password"
-            className="form-input"
             autoComplete="new-password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
@@ -125,8 +134,36 @@ export function Register() {
           <p className="field-hint">Mínimo de 8 caracteres.</p>
         </div>
 
+        <div className="form-field">
+          <label className="form-label" htmlFor="confirmPassword">
+            Repetir palavra-passe
+          </label>
+          <PasswordField
+            id="confirmPassword"
+            name="confirmPassword"
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={(event) => setConfirmPassword(event.target.value)}
+            required
+            minLength={8}
+            aria-invalid={passwordsMismatch}
+            aria-describedby={
+              passwordsMismatch ? 'confirm-password-mismatch' : undefined
+            }
+          />
+          {passwordsMismatch && (
+            <p id="confirm-password-mismatch" className="field-hint form-message--error">
+              As palavras-passe não coincidem.
+            </p>
+          )}
+        </div>
+
         <div className="form-actions">
-          <button type="submit" className="button button--primary" disabled={isSubmitting}>
+          <button
+            type="submit"
+            className="button button--primary"
+            disabled={isSubmitting || passwordsMismatch}
+          >
             {isSubmitting ? 'A criar conta…' : 'Criar conta'}
           </button>
           <p className="form-secondary-link">

@@ -1,4 +1,9 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import {
+  createClient,
+  type AuthChangeEvent,
+  type Session,
+  type SupabaseClient,
+} from '@supabase/supabase-js'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -99,29 +104,45 @@ export async function resetPassword(email: string) {
   return data
 }
 
-export async function requestPasswordReset(email: string) {
-  const response = await fetch('/api/auth/reset-password', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email }),
-  })
+/** Marca o fluxo “definir nova palavra-passe” após link do email (sessionStorage). */
+export const PASSWORD_RECOVERY_STORAGE_KEY = 'argentea-password-recovery'
 
-  if (!response.ok) {
-    let message = 'Não foi possível processar o pedido de recuperação de password.'
-
-    try {
-      const body = (await response.json()) as { message?: string }
-      if (body?.message) {
-        message = body.message
-      }
-    } catch {
-      // Ignorar erros de parsing e usar mensagem genérica
-    }
-
-    throw new Error(message)
+export function clearPasswordRecoveryStorage() {
+  try {
+    sessionStorage.removeItem(PASSWORD_RECOVERY_STORAGE_KEY)
+  } catch {
+    /* ignore */
   }
+}
+
+export function markPasswordRecoveryPending() {
+  try {
+    sessionStorage.setItem(PASSWORD_RECOVERY_STORAGE_KEY, '1')
+  } catch {
+    /* ignore */
+  }
+}
+
+export function readPasswordRecoveryPending(): boolean {
+  try {
+    return sessionStorage.getItem(PASSWORD_RECOVERY_STORAGE_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+export function onAuthStateChange(
+  callback: (event: AuthChangeEvent, session: Session | null) => void,
+) {
+  return getSupabaseClient().auth.onAuthStateChange(callback)
+}
+
+export async function getAuthSession() {
+  const { data, error } = await getSupabaseClient().auth.getSession()
+  if (error) {
+    throw error
+  }
+  return data.session
 }
 
 export async function signOut() {
